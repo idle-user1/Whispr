@@ -24,6 +24,10 @@ model User {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   location          String   @default("")
+
+  sentRequests        FriendRequest[]  @relation("SentRequests")
+  receivedRequests    FriendRequest[]  @relation("ReceivedRequests")
+  
   friends          Friendship[] @relation("UserFriends")
   friendOf         Friendship[] @relation("FriendOfUser")
 }
@@ -37,4 +41,17 @@ model Friendship {
   createdAt DateTime @default(now())
 
   @@unique([userId, friendId])
+}
+
+model FriendRequest {
+  id          Int      @id @default(autoincrement())
+  sender      User     @relation("SentRequests", fields: [senderId], references: [id])
+  senderId    Int
+  recipient   User     @relation("ReceivedRequests", fields: [recipientId], references: [id])
+  recipientId Int
+  status      String   @default("pending") // "pending" or "accepted"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([senderId, recipientId]) // Prevent duplicate requests
 }

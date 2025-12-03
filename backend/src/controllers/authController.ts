@@ -145,8 +145,18 @@ export async function login(req: Request, res: Response) {
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
       }
+      try {
+         await upsertStreamUser({
+        id: updatedUser.id.toString(),
+        name: updatedUser.fullName,
+        image: updatedUser.profilePic || "",
+      }); 
+      } catch (error) {
+        console.error("Error upserting Stream user:", error);
+      }
+     
 
-      res.status(200).json({ success: true, user: updatedUser });
+      res.status(200).json({ success: true, user: updatedUser }); 
     }
     
   

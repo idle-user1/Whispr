@@ -20,11 +20,13 @@ export const protectRoute =async (
     }
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
+
     });
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
-    req.user = user;
+    const { password: _, ...userWithoutPassword } = user;
+    req.user = userWithoutPassword;
     // If everything is good → continue
     next();
   } catch (error) {
