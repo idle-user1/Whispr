@@ -12,14 +12,14 @@ const SignUpPage = () => {
     password: "",
   });
   const queryClient = useQueryClient();
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, error } = useMutation({
     mutationFn: signup,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       console.log("Signup error:", error);
-      const errorMessage = error?.response?.data?.message || "Signup failed. Please try again.";
+      const errorMessage = error?.response?.data?.message ;
       toast.error(errorMessage);
     }
   });
@@ -40,6 +40,17 @@ const SignUpPage = () => {
             <SigmaSquareIcon size={32} className="text-primary" />
             <span className="text-2xl font-bold">Whispr</span>
           </div>
+
+          {/* Error Display */}
+          {error && (
+            <div className="alert alert-error mb-4">
+              <span>
+                {(error instanceof Error && 'response' in error 
+                  ? (error as { response?: { data?: { message?: string } } }).response?.data?.message 
+                  : undefined) ?? "Signup failed. Please try again."}
+              </span>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">

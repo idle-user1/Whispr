@@ -8,16 +8,16 @@ import toast from 'react-hot-toast'
 
 const LoginPage = () => {
   const queryClient = useQueryClient()
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, error } = useMutation({
     mutationFn: login,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       toast.success("Login successful!");
       
     },
-    onError: (error: any) => {
+    onError: (error) => {
       console.log("Login error:", error);
-      const errorMessage = error?.response?.data?.message || "Login failed. Please try again.";
+      const errorMessage = error?.response?.data?.message ;
       toast.error(errorMessage);
     }
   })
@@ -31,7 +31,7 @@ const LoginPage = () => {
   }
   return (
     <div data-theme="forest" className="h-screen flex items-center justify-center p-4 sm:p-6 md:p-8">
-      <div className='w-full max-w-5xl bg-base-200 flex'>
+      <div className="border border-primary/25 max-w-5xl mx-auto w-full bg-base-100 rounded-xl shadow-lg overflow-hidden flex flex-col lg:flex-row">
         {/* LEFT SECTION - Brand + Form */}
         <div className="lg:w-1/2 p-6 md:p-8 flex flex-col">
           {/* Logo */}
@@ -41,7 +41,15 @@ const LoginPage = () => {
           </div>
            {/* Error Display */}
          
-
+          {error && (
+            <div className="alert alert-error mb-4">
+              <span>
+                {(error instanceof Error && 'response' in error 
+                  ? (error as { response?: { data?: { message?: string } } }).response?.data?.message 
+                  : undefined) ?? "Signup failed. Please try again."}
+              </span>
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -162,11 +170,10 @@ const LoginPage = () => {
               )}
             </button>
 
-            {/* LOGIN LINK */}
             <div className="text-center mt-2">
               <p className="text-sm">
                Don't have an account?{" "}
-                <Link to="/login" className="link link-primary font-semibold">
+                <Link to="/signup" className="link link-primary font-semibold">
                   Sign Up
                   
                 </Link>
@@ -180,7 +187,7 @@ const LoginPage = () => {
             <div className="relative aspect-square max-w-sm mx-auto">
               <img
                 src="/signUp.jpg"
-                alt="Language connection illustration"
+                alt="Chat illustration"
                 className="w-full h-full object-cover rounded-lg"
               />
             </div>
